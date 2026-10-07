@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator & Visualisasi Dilatasi Geometri</title>
+  <!-- Library KaTeX untuk Rendering Notasi Matematika Secara Otomatis -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f6;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    header h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .intro-card {
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: left;
+      margin-top: 10px;
+    }
+
+    .intro-card p {
+      color: #444;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .intro-card ul {
+      margin-left: 20px;
+      color: #555;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      max-width: 1100px;
+      width: 100%;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .canvas-container {
+      flex: 1 1 450px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    canvas {
+      background: #fff;
+      border-radius: 4px;
+    }
+
+    .controls {
+      flex: 1 1 350px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 4px;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .input-group label {
+      font-weight: bold;
+      width: 70px;
+    }
+
+    .input-group input[type="number"], .input-group select {
+      padding: 5px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .input-group input[type="number"] {
+      width: 60px;
+      text-align: center;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 5px;
+      background: #ddd;
+      outline: none;
+    }
+
+    .k-value {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #e67e22;
+      min-width: 35px;
+    }
+
+    .result-box {
+      background: #eef7fc;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #bce1f7;
+    }
+
+    .result-box h3 {
+      color: #2980b9;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .formula-info {
+      font-size: 0.85rem;
+      background: #fff;
+      padding: 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+    }
+
+    .coord-list {
+      list-style: none;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.95rem;
+    }
+
+    .coord-list li {
+      margin-bottom: 6px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .color-box {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    .steps-container {
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .step-card {
+      background: #fdfdfd;
+      border-left: 4px solid #3498db;
+      padding: 12px 15px;
+      margin-bottom: 12px;
+      border-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .step-card h4 {
+      color: #2c3e50;
+      margin-bottom: 6px;
+    }
+
+    .step-detail {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      color: #2c3e50;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Kalkulator & Visualisasi Dilatasi</h1>
+    
+    <div class="intro-card">
+      <p><strong>Pengertian Dilatasi:</strong> Dilatasi adalah transformasi geometri yang mengubah ukuran (memperbesar atau memperkecil) suatu objek tanpa mengubah bentuk dasarnya. Dilatasi dapat diterapkan pada titik, garis, maupun bangun datar. Transformasi ini ditentukan oleh suatu <em>titik pusat dilatasi</em> $(a,b)$ dan <em>faktor skala</em> $k$.</p>
+      <p><strong>Contoh di Kehidupan Nyata:</strong></p>
+      <ul>
+        <li><strong>Zooming Kamera:</strong> Memperbesar atau memperkecil tampilan objek pada layar ponsel.</li>
+        <li><strong>Pupil Mata:</strong> Pupil mata mengecil saat terkena cahaya terang dan membesar di tempat gelap.</li>
+        <li><strong>Proyektor:</strong> Memancarkan bayangan gambar dari ukuran kecil di dalam proyektor menjadi ukuran besar di layar/dinding.</li>
+        <li><strong>Miniatur / Maket:</strong> Pembuatan maket bangunan atau miniatur mobil yang memperkecil objek asli dengan skala tertentu.</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="canvas-container">
+      <canvas id="gridCanvas" width="450" height="450"></canvas>
+    </div>
+
+    <div class="controls">
+      <!-- Mode Objek -->
+      <div>
+        <div class="section-title">1. Pilih Mode Objek</div>
+        <div class="input-group">
+          <label for="modeSelect">Mode:</label>
+          <select id="modeSelect" style="flex:1;">
+            <option value="point">Dilatasi Titik (1 Titik)</option>
+            <option value="line">Dilatasi Garis (2 Titik)</option>
+            <option value="triangle" selected>Dilatasi Segitiga (3 Titik)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Pengaturan Titik Pusat -->
+      <div>
+        <div class="section-title">2. Pusat Dilatasi $(a, b)$</div>
+        <div class="input-group">
+          <label>Pusat:</label>
+          a: <input type="number" id="centerA" value="0" step="1">
+          b: <input type="number" id="centerB" value="0" step="1">
+        </div>
+      </div>
+
+      <!-- Pengaturan Faktor Skala -->
+      <div>
+        <div class="section-title">3. Faktor Skala ($k$)</div>
+        <div class="slider-container">
+          <input type="range" id="scaleSlider" min="-3" max="3" step="0.5" value="2">
+          <span class="k-value" id="kDisplay">2</span>
+        </div>
+      </div>
+
+      <!-- Pengaturan Titik Koordinat -->
+      <div>
+        <div class="section-title">4. Koordinat Titik Asli</div>
+        <div class="input-group" id="groupA">
+          <label style="color: #2980b9;">Titik A:</label>
+          x: <input type="number" id="ax" value="1">
+          y: <input type="number" id="ay" value="1">
+        </div>
+        <div class="input-group" id="groupB">
+          <label style="color: #2980b9;">Titik B:</label>
+          x: <input type="number" id="bx" value="3">
+          y: <input type="number" id="by" value="1">
+        </div>
+        <div class="input-group" id="groupC">
+          <label style="color: #2980b9;">Titik C:</label>
+          x: <input type="number" id="cx" value="2">
+          y: <input type="number" id="cy" value="4">
+        </div>
+      </div>
+
+      <!-- Hasil Perhitungan Instan -->
+      <div class="result-box">
+        <h3>Hasil Jawaban Instan</h3>
+        <div class="formula-info">
+          <strong>Rumus:</strong><br>
+          $x' = a + k(x - a)$<br>
+          $y' = b + k(y - b)$
+        </div>
+        <ul class="coord-list">
+          <li id="resAWrapper">A' = <span id="resA" style="font-weight:bold; color:#e67e22;"></span></li>
+          <li id="resBWrapper">B' = <span id="resB" style="font-weight:bold; color:#e67e22;"></span></li>
+          <li id="resCWrapper">C' = <span id="resC" style="font-weight:bold; color:#e67e22;"></span></li>
+        </ul>
+
+        <div class="legend">
+          <div class="legend-item">
+            <div class="color-box" style="background: #3498db;"></div> Asli
+          </div>
+          <div class="legend-item">
+            <div class="color-box" style="background: #e67e22;"></div> Hasil Dilatasi
+          </div>
+          <div class="legend-item">
+            <div class="color-box" style="background: #e74c3c;"></div> Pusat $(a,b)$
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Langkah-Langkah Penyelesaian -->
+  <div class="steps-container">
+    <div class="section-title" style="font-size: 1.1rem; margin-bottom: 15px;">
+      5. Langkah-Langkah Penyelesaian (Step-by-Step)
+    </div>
+    <div id="stepsOutput"></div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gridCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Element Inputs
+    const modeSelect = document.getElementById('modeSelect');
+    const centerAInput = document.getElementById('centerA');
+    const centerBInput = document.getElementById('centerB');
+    const slider = document.getElementById('scaleSlider');
+    const kDisplay = document.getElementById('kDisplay');
+
+    const groupB = document.getElementById('groupB');
+    const groupC = document.getElementById('groupC');
+    const resBWrapper = document.getElementById('resBWrapper');
+    const resCWrapper = document.getElementById('resCWrapper');
+
+    const axInput = document.getElementById('ax');
+    const ayInput = document.getElementById('ay');
+    const bxInput = document.getElementById('bx');
+    const byInput = document.getElementById('by');
+    const cxInput = document.getElementById('cx');
+    const cyInput = document.getElementById('cy');
+
+    const resA = document.getElementById('resA');
+    const resB = document.getElementById('resB');
+    const resC = document.getElementById('resC');
+    const stepsOutput = document.getElementById('stepsOutput');
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const canvasCenter = width / 2;
+    const gridSize = 20;
+
+    function toCanvasX(x) { return canvasCenter + x * gridSize; }
+    function toCanvasY(y) { return canvasCenter - y * gridSize; }
+
+    function calculateDilatation(x, y, a, b, k) {
+      const xPrime = a + k * (x - a);
+      const yPrime = b + k * (y - b);
+      return { x: xPrime, y: yPrime };
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = '#f0f0f0';
+      ctx.lineWidth = 1;
+
+      for (let x = 0; x <= width; x += gridSize) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+      }
+      for (let y = 0; y <= height; y += gridSize) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#bbb';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, canvasCenter); ctx.lineTo(width, canvasCenter); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(canvasCenter, 0); ctx.lineTo(canvasCenter, height); ctx.stroke();
+    }
+
+    function drawShape(points, strokeColor, fillColor, mode) {
+      ctx.save();
+      ctx.strokeStyle = strokeColor;
+      ctx.fillStyle = fillColor;
+      ctx.lineWidth = 2;
+
+      if (mode === 'point') {
+        // Gambarkan lingkaran penuh untuk titik
+        points.forEach(p => {
+          ctx.beginPath();
+          ctx.arc(toCanvasX(p.x), toCanvasY(p.y), 6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        });
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(points[0].x), toCanvasY(points[0].y));
+        for (let i = 1; i < points.length; i++) {
+          ctx.lineTo(toCanvasX(points[i].x), toCanvasY(points[i].y));
+        }
+
+        if (mode === 'triangle') {
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawCenterPoint(a, b) {
+      ctx.save();
+      ctx.fillStyle = '#e74c3c';
+      ctx.beginPath();
+      ctx.arc(toCanvasX(a), toCanvasY(b), 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawProjections(a, b, dilatedPoints) {
+      ctx.save();
+      ctx.strokeStyle = '#ccc';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+
+      dilatedPoints.forEach(p => {
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(a), toCanvasY(b));
+        ctx.lineTo(toCanvasX(p.x), toCanvasY(p.y));
+        ctx.stroke();
+      });
+
+      ctx.restore();
+    }
+
+    function generateStepHTML(name, x, y, a, b, k) {
+      const dx = x - a;
+      const dy = y - b;
+      const kdx = k * dx;
+      const kdy = k * dy;
+      const xPrime = a + kdx;
+      const yPrime = b + kdy;
+
+      return `
+        <div class="step-card">
+          <h4>Transformasi Titik ${name}(${x}, ${y})</h4>
+          <div class="step-detail">
+            1. Hitung selisih relatif terhadap pusat (${a}, ${b}):<br>
+               &nbsp;&nbsp;dx = ${x} - ${a} = ${dx}<br>
+               &nbsp;&nbsp;dy = ${y} - ${b} = ${dy}<br><br>
+            2. Kalikan selisih dengan faktor skala k = ${k}:<br>
+               &nbsp;&nbsp;k · dx = ${k} × ${dx} = ${kdx}<br>
+               &nbsp;&nbsp;k · dy = ${k} × ${dy} = ${kdy}<br><br>
+            3. Tambahkan hasil ke titik pusat (${a}, ${b}):<br>
+               &nbsp;&nbsp;x' = ${a} + ${kdx} = <strong>${xPrime}</strong><br>
+               &nbsp;&nbsp;y' = ${b} + ${kdy} = <strong>${yPrime}</strong><br><br>
+            <strong>Hasil: ${name}'(${xPrime}, ${yPrime})</strong>
+          </div>
+        </div>
+      `;
+    }
+
+    function update() {
+      const mode = modeSelect.value;
+
+      // Kontrol Visibilitas Form Input dan Hasil Berdasarkan Mode
+      if (mode === 'point') {
+        groupB.style.display = 'none';
+        groupC.style.display = 'none';
+        resBWrapper.style.display = 'none';
+        resCWrapper.style.display = 'none';
+      } else if (mode === 'line') {
+        groupB.style.display = 'flex';
+        groupC.style.display = 'none';
+        resBWrapper.style.display = 'list-item';
+        resCWrapper.style.display = 'none';
+      } else { // triangle
+        groupB.style.display = 'flex';
+        groupC.style.display = 'flex';
+        resBWrapper.style.display = 'list-item';
+        resCWrapper.style.display = 'list-item';
+      }
+
+      const a = parseFloat(centerAInput.value) || 0;
+      const b = parseFloat(centerBInput.value) || 0;
+      const k = parseFloat(slider.value);
+      kDisplay.textContent = k;
+
+      const origA = { name: 'A', x: parseFloat(axInput.value) || 0, y: parseFloat(ayInput.value) || 0 };
+      const origB = { name: 'B', x: parseFloat(bxInput.value) || 0, y: parseFloat(byInput.value) || 0 };
+      const origC = { name: 'C', x: parseFloat(cxInput.value) || 0, y: parseFloat(cyInput.value) || 0 };
+
+      let originalPoints = [origA];
+      if (mode === 'line') originalPoints = [origA, origB];
+      if (mode === 'triangle') originalPoints = [origA, origB, origC];
+
+      // Hitung Titik Bayangan
+      const dilatedPoints = originalPoints.map(p => calculateDilatation(p.x, p.y, a, b, k));
+
+      // Update Teks Jawaban Instan
+      resA.textContent = `(${dilatedPoints[0].x.toFixed(1)}, ${dilatedPoints[0].y.toFixed(1)})`;
+      if (mode !== 'point') {
+        resB.textContent = `(${dilatedPoints[1].x.toFixed(1)}, ${dilatedPoints[1].y.toFixed(1)})`;
+      }
+      if (mode === 'triangle') {
+        resC.textContent = `(${dilatedPoints[2].x.toFixed(1)}, ${dilatedPoints[2].y.toFixed(1)})`;
+      }
+
+      // Generate Langkah-Langkah Perhitungan
+      let stepsHTML = '';
+      originalPoints.forEach(p => {
+        stepsHTML += generateStepHTML(p.name, p.x, p.y, a, b, k);
+      });
+      stepsOutput.innerHTML = stepsHTML;
+
+      // Render Visual
+      drawGrid();
+      drawProjections(a, b, dilatedPoints);
+      drawShape(originalPoints, '#3498db', 'rgba(52, 152, 219, 0.25)', mode);
+      drawShape(dilatedPoints, '#e67e22', 'rgba(230, 126, 34, 0.25)', mode);
+      drawCenterPoint(a, b);
+
+      if (window.renderMathInElement) {
+        renderMathInElement(stepsOutput);
+      }
+    }
+
+    // Event Listeners
+    [modeSelect, centerAInput, centerBInput, slider, axInput, ayInput, bxInput, byInput, cxInput, cyInput].forEach(elem => {
+      elem.addEventListener('input', update);
+    });
+
+    update();
+  </script>
+</body>
+</html>
